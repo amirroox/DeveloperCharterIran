@@ -478,7 +478,7 @@ select:focus {
     }
 
     .tab-content {
-        padding: 20px;
+        padding: 10px;
     }
 
     .tabs {
@@ -494,7 +494,7 @@ select:focus {
         gap: 1rem;
     }
     .skill-level div button {
-        width: unset;
+        width: unset !important;
     }
 
     .checkbox-grid {
@@ -507,6 +507,33 @@ select:focus {
 
     .section {
         padding: 20px;
+    }
+
+    .tabs, #breakdown {
+        display: flex;
+        flex-direction: column;
+    }
+
+    label, input, select, textarea{
+        font-size: .8rem !important;
+    }
+
+    h1 {
+        font-size: 1.7rem !important;
+    }
+    h2 {
+        font-size: 1.3rem !important;
+    }
+    h3 {
+        font-size: 1rem !important;
+    }
+
+    .result-box {
+        padding: 15px;
+    }
+
+    .notes-box li, .notes-box-why li {
+        font-size: .8rem;
     }
 }
 
@@ -547,6 +574,12 @@ select:focus {
     }
 }
 
+@media (max-width: 1200px) {
+    .skill-level div button {
+        width: 12rem;
+    }
+}
+
 #updateBtnDoller {
     display: inline;
     border: none;
@@ -555,3 +588,56 @@ select:focus {
     border-radius: 13px;
     cursor: pointer;
 }
+
+#goup {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+
+    width: 56px;
+    height: 56px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 24px;
+    font-weight: bold;
+
+    color: white;
+    background: linear-gradient(135deg, #ff416c, #ff4b2b);
+
+    border-radius: 50%;
+    cursor: pointer;
+
+    box-shadow: 0 10px 30px rgba(255, 75, 43, 0.4);
+    backdrop-filter: blur(10px);
+
+    /* مهم */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+
+    transition: 
+        opacity 0.4s ease,
+        transform 0.4s ease,
+        box-shadow 0.3s ease;
+}
+
+#goup.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Hover */
+#goup:hover {
+    transform: translateY(-6px) scale(1.05);
+    box-shadow: 0 15px 40px rgba(255, 75, 43, 0.6);
+}
+
+/* Click */
+#goup:active {
+    transform: scale(0.95);
+}
+

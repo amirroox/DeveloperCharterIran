@@ -300,7 +300,7 @@ button:disabled {
     background: white;
     border-radius: 10px;
     margin: 10px 0;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 5px rgba(255, 0, 0, 0.384);
 }
 
 .signature-name {
@@ -393,12 +393,37 @@ footer {
 }
 
 @media (max-width: 768px) {
+    header {
+        padding: unset;
+    }
+    .container {
+        padding: 20px 10px;
+    }
     h1 {
-        font-size: 2rem;
+        font-size: 2rem !important;
+    }
+    h2 {
+        font-size: 1.5rem !important;
+    }
+    p, li {
+        font-size: .85rem !important;
     }
 
     .content-section {
+        padding: 20px 15px;
+    }
+
+    .pricing-guide {
+        padding: 0;
+    }
+    
+    .pricing-guide p:nth-child(2) {
         padding: 20px;
+        background-color: #afafaf;
+    }
+
+    .pricing-guide li {
+        margin-top: 1rem;
     }
 
     .form-container {
@@ -406,6 +431,28 @@ footer {
     }
 
     .tabs {
+        flex-direction: column;
+    }
+
+    label, input, select, textarea{
+        font-size: .8rem;
+    }
+
+    #violatorContact {
+        height: 5rem;
+    }
+
+    input::-webkit-input-placeholder {
+        text-wrap: unset;
+    }
+
+    #signButton, #reportButton {
+        display: block;
+        margin: auto;
+    }
+
+    .signature-info {
+        display: flex;
         flex-direction: column;
     }
 }

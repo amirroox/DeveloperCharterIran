@@ -788,7 +788,31 @@ $dollar = $cache["price"];
             </div>
         </div>
 
+        <div id="goup">
+            ↑
+        </div>
+
         <script src="../assets/calculator.js"></script>
+
+        <script>
+            const goUpBtn = document.getElementById("goup");
+
+            window.addEventListener("scroll", () => {
+                if (window.scrollY > 300) {
+                    goUpBtn.classList.add("show");
+                } else {
+                    goUpBtn.classList.remove("show");
+                }
+            });
+
+            goUpBtn.addEventListener("click", () => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth"
+                });
+            });
+        </script>
+
 </body>
 
 </html>
