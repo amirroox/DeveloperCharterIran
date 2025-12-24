@@ -26,7 +26,7 @@ This platform helps developers and employers collaborate with transparent and fa
 ## ✨ Key Features
 
 ### 📝 Charter Signing System
-- Professional developer registration
+- developer registration
 - Real-time signer statistics
 - Support for Persian (Jalali) calendar
 
@@ -254,6 +254,7 @@ MIT License - Free for personal and commercial use
 - Iranian developer community who inspired this project
 - [jdf.php](http://jdf.scr.ir) library for Jalali date conversion
 - Iranian open-source community
+- AI! For This README
 
 ---
 
