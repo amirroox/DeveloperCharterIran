@@ -3,8 +3,10 @@ require_once 'api/config.php';
 include_once 'helper/jdf.php'; 
 
 // Get filter parameters
-$status = $_GET['status'] ?? 'all';
+$status = "verified";  // Just Verified
 $violation_type = $_GET['type'] ?? 'all';
+$reporter_type = $_GET['reporter_type'] ?? 'all';
+$query_search = $_GET['query_search'] ?? '';
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $per_page = 10;
 $offset = ($page - 1) * $per_page;
@@ -24,6 +26,31 @@ try {
         $where[] = "vr.violation_type = :violation_type";
         $params['violation_type'] = $violation_type;
     }
+
+    if ($reporter_type !== 'all') {
+        $where[] = "vr.reporter_type = :reporter_type";
+        $params['reporter_type'] = $reporter_type;
+    }
+
+    if ($query_search !== '') {
+        $fields = [
+            'vr.violator_name',
+            'vr.violator_contact',
+            'vr.description',
+            'vr.company_name',
+            'vr.project_description'
+        ];
+
+        $likes = [];
+        foreach ($fields as $i => $field) {
+            $param = ":query_search{$i}";
+            $likes[] = "$field LIKE $param";
+            $params["query_search{$i}"] = "%{$query_search}%";
+        }
+
+        $where[] = '(' . implode(' OR ', $likes) . ')';
+    }
+
     
     $where_clause = implode(' AND ', $where);
 
@@ -77,17 +104,7 @@ try {
 
     <div class="container">
         <div class="filters">
-            <form method="GET" class="filter-form">
-                <div class="filter-group">
-                    <label>وضعیت:</label>
-                    <select name="status" onchange="this.form.submit()">
-                        <option value="all" <?= $status === 'all' ? 'selected' : '' ?>>همه</option>
-                        <option value="pending" <?= $status === 'pending' ? 'selected' : '' ?>>در انتظار بررسی</option>
-                        <option value="verified" <?= $status === 'verified' ? 'selected' : '' ?>>تایید شده</option>
-                        <option value="rejected" <?= $status === 'rejected' ? 'selected' : '' ?>>رد شده</option>
-                    </select>
-                </div>
-                
+            <form method="GET" class="filter-form">                
                 <div class="filter-group">
                     <label>نوع:</label>
                     <select name="type" onchange="this.form.submit()">
@@ -98,6 +115,21 @@ try {
                         <option value="other" <?= $violation_type === 'other' ? 'selected' : '' ?>>سایر</option>
                     </select>
                 </div>
+
+                <div class="filter-group">
+                    <label>متخلف:</label>
+                    <select name="reporter_type" onchange="this.form.submit()">
+                        <option value="all" <?= $reporter_type === 'all' ? 'selected' : '' ?>>همه</option>
+                        <option value="employer" <?= $reporter_type === 'employer' ? 'selected' : '' ?>>فریلنسر/پیمانکار</option>
+                        <option value="contractor" <?= $reporter_type === 'contractor' ? 'selected' : '' ?>>کارفرما</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>جستجو:</label>
+                    <input name="query_search" onchange="this.form.submit()" value="<?= strlen($query_search) ? $query_search : '' ?>">
+                    <button>🔍</button>
+                </div>
             </form>
         </div>
 
@@ -106,7 +138,7 @@ try {
                 <p style="text-align: center; color: #ffffffff; padding: 40px;">هیچ گزارشی یافت نشد</p>
             <?php else: ?>
                 <?php foreach ($reports as $report): ?>
-                    <div class="report-card" data-report-id="<?= $report['id'] ?>">
+                    <div class="report-card" data-report-id="<?= $report['id'] ?>" id="report-<?= $report['id'] ?>">
                         <div class="report-header">
                             <div class="report-meta">
                                 <span class="status-badge status-<?= $report['status'] ?>"><?= getStatusLabel($report['status']) ?></span>
@@ -204,6 +236,35 @@ try {
     </div>
 
     <script src="./assets/reports.js"></script>
+
+    <?php if ($query_search !== '' && mb_strlen($query_search) > 2): ?>
+        <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const keyword = <?= json_encode($query_search) ?>;
+            if (!keyword) return;
+
+            const elements = document.querySelectorAll('.report-body');
+            const regex = new RegExp(`(${keyword})`, 'gi');
+
+            elements.forEach(el => {
+                el.innerHTML = el.innerHTML.replace(
+                    regex,
+                    '<span class="highlight-search">$1</span>'
+                );
+            });
+        });
+        </script>
+
+        <style>
+        .highlight-search {
+            background-color: #c8f7c5;
+            color: #1e7e34;
+            font-weight: bold;
+            border-radius: 3px;
+        }
+        </style>
+    <?php endif; ?>
+
 </body>
 </html>
 
