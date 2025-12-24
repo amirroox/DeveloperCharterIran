@@ -1,7 +1,7 @@
 # 📜 Iranian Software Developers Charter
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![PHP Version](https://img.shields.io/badge/PHP-7.4%2B-blue)](https://www.php.net/)
+[![PHP Version](https://img.shields.io/badge/PHP-8.1%2B-blue)](https://www.php.net/)
 [![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 **A platform for fair pricing, transparency, and elevating Iran's software industry**
@@ -63,7 +63,7 @@ This platform helps developers and employers collaborate with transparent and fa
 
 ### Prerequisites
 ```bash
-- PHP 7.4 or higher
+- PHP 8.1 or higher
 - MySQL 5.7+ or MariaDB 10.2+
 - Apache/Nginx
 - Composer (optional)
@@ -123,7 +123,7 @@ location / {
 }
 
 location ~ \.php$ {
-    fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
+    fastcgi_pass unix:/var/run/php/php8.1-fpm.sock;
     fastcgi_index index.php;
     include fastcgi_params;
 }

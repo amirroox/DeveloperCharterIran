@@ -3,7 +3,7 @@
 # 📜 منشور توسعه‌دهندگان نرم‌افزار ایران
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![PHP Version](https://img.shields.io/badge/PHP-7.4%2B-blue)](https://www.php.net/)
+[![PHP Version](https://img.shields.io/badge/PHP-8.1%2B-blue)](https://www.php.net/)
 [![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 **پلتفرمی برای احترام به ارزش کار، شفافیت در قیمت‌گذاری و ارتقای صنعت نرم‌افزار ایران**
@@ -68,7 +68,7 @@
 <div dir="ltr">
 
 ```bash
-- PHP 7.4 یا بالاتر
+- PHP 8.1 یا بالاتر
 - MySQL 5.7+ یا MariaDB 10.2+
 - Apache/Nginx
 - Composer (اختیاری)
@@ -143,7 +143,7 @@ location / {
 }
 
 location ~ \.php$ {
-    fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
+    fastcgi_pass unix:/var/run/php/php8.1-fpm.sock;
     fastcgi_index index.php;
     include fastcgi_params;
 }
