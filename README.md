@@ -233,7 +233,7 @@ We welcome contributions!
 📝 Lines of Code: ~5,000+ lines
 🗂️ Files: 24 files
 🔧 Technologies: PHP, MySQL, JavaScript, CSS (Pure)
-📅 Project Start: 2024
+📅 Project Start: 2026
 👥 Contributors: Open to all
 ```
 
