@@ -1,0 +1,184 @@
+-- ==========================================
+-- Database Schema for Dev Manifesto Platform
+-- ==========================================
+-- Iranian Software Developers Professional Charter
+-- A platform for fair pricing and industry standards
+-- ==========================================
+
+-- Create database if not exists
+CREATE DATABASE IF NOT EXISTS dev_manifesto CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+USE dev_manifesto;
+
+-- ==========================================
+-- Signatures Table
+-- Stores manifesto signatures from developers
+-- ==========================================
+CREATE TABLE IF NOT EXISTS signatures (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    full_name VARCHAR(255) NOT NULL COMMENT 'Full name of the signer',
+    email VARCHAR(255) NOT NULL UNIQUE COMMENT 'Email address (unique)',
+    job_title VARCHAR(255) DEFAULT NULL COMMENT 'Job title (e.g., Full Stack Developer)',
+    company VARCHAR(255) DEFAULT NULL COMMENT 'Company name or Freelancer',
+    experience_years INT DEFAULT NULL COMMENT 'Years of experience',
+    city VARCHAR(100) DEFAULT NULL COMMENT 'City name',
+    ip_address VARCHAR(45) NOT NULL COMMENT 'IP address for security',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Signature timestamp',
+    
+    INDEX idx_email (email),
+    INDEX idx_created_at (created_at),
+    INDEX idx_city (city),
+    INDEX idx_ip_address (ip_address)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='Manifesto signatures from developers';
+
+-- ==========================================
+-- Violation Reports Table
+-- Stores pricing violation reports
+-- ==========================================
+CREATE TABLE IF NOT EXISTS violation_reports (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    reporter_email VARCHAR(255) NOT NULL COMMENT 'Reporter email address',
+    reporter_type ENUM('employer', 'contractor') NOT NULL COMMENT 'Reporter role: employer or contractor',
+    violator_name VARCHAR(255) NOT NULL COMMENT 'Name of person/company violating standards',
+    violator_type ENUM('employer', 'contractor') NOT NULL COMMENT 'Violator role: employer or contractor',
+    violator_contact VARCHAR(255) NOT NULL COMMENT 'Contact info (phone, telegram, etc)',
+    project_description TEXT DEFAULT NULL COMMENT 'Brief project description',
+    estimated_fair_price DECIMAL(15, 2) DEFAULT NULL COMMENT 'Estimated fair price in Toman',
+    offered_price DECIMAL(15, 2) DEFAULT NULL COMMENT 'Actual offered/received price in Toman',
+    violation_type ENUM('underprice', 'overprice', 'unfair_practice', 'other') DEFAULT 'underprice' COMMENT 'Type of violation',
+    description TEXT NOT NULL COMMENT 'Detailed description of the violation',
+    evidence_url TEXT DEFAULT NULL COMMENT 'URL to evidence/proof',
+    status ENUM('pending', 'verified', 'rejected') DEFAULT 'pending' COMMENT 'Report status',
+    ip_address VARCHAR(45) NOT NULL COMMENT 'Reporter IP address',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Report submission timestamp',
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Last update timestamp',
+    
+    INDEX idx_reporter_email (reporter_email),
+    INDEX idx_reporter_type (reporter_type),
+    INDEX idx_violator_type (violator_type),
+    INDEX idx_status (status),
+    INDEX idx_violation_type (violation_type),
+    INDEX idx_created_at (created_at),
+    INDEX idx_ip_address (ip_address)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='Pricing violation reports from community';
+
+-- ==========================================
+-- Daily Statistics Table
+-- Aggregated daily statistics
+-- ==========================================
+CREATE TABLE IF NOT EXISTS daily_stats (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    stat_date DATE NOT NULL UNIQUE COMMENT 'Statistics date',
+    total_signatures INT DEFAULT 0 COMMENT 'Total signatures for the day',
+    total_reports INT DEFAULT 0 COMMENT 'Total reports for the day',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    INDEX idx_stat_date (stat_date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='Daily aggregated statistics';
+
+-- ==========================================
+-- Report Comments Table
+-- User comments on violation reports
+-- ==========================================
+CREATE TABLE IF NOT EXISTS report_comments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    report_id INT NOT NULL COMMENT 'Related report ID',
+    user_name VARCHAR(255) NOT NULL COMMENT 'Commenter name',
+    user_email VARCHAR(255) NOT NULL COMMENT 'Commenter email',
+    comment TEXT NOT NULL COMMENT 'Comment text',
+    ip_address VARCHAR(45) NOT NULL COMMENT 'Commenter IP address',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Comment timestamp',
+    
+    FOREIGN KEY (report_id) REFERENCES violation_reports(id) ON DELETE CASCADE,
+    INDEX idx_report_id (report_id),
+    INDEX idx_created_at (created_at),
+    INDEX idx_user_email (user_email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='User comments on reports';
+
+-- ==========================================
+-- Report Reactions Table
+-- Like/Dislike reactions on reports
+-- ==========================================
+CREATE TABLE IF NOT EXISTS report_reactions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    report_id INT NOT NULL COMMENT 'Related report ID',
+    user_email VARCHAR(255) NOT NULL COMMENT 'User email who reacted',
+    reaction_type ENUM('like', 'dislike') NOT NULL COMMENT 'Type of reaction',
+    ip_address VARCHAR(45) NOT NULL COMMENT 'User IP address',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Reaction timestamp',
+    
+    FOREIGN KEY (report_id) REFERENCES violation_reports(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_user_reaction (report_id, user_email) COMMENT 'One reaction per user per report',
+    INDEX idx_report_id (report_id),
+    INDEX idx_reaction_type (reaction_type),
+    INDEX idx_user_email (user_email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='User reactions (likes/dislikes) on reports';
+
+-- ==========================================
+-- Admin Users Table
+-- Admin panel user accounts
+-- ==========================================
+CREATE TABLE IF NOT EXISTS admin_users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(100) NOT NULL UNIQUE COMMENT 'Admin username',
+    password_hash VARCHAR(255) NOT NULL COMMENT 'Hashed password (bcrypt or md5)',
+    email VARCHAR(255) NOT NULL COMMENT 'Admin email',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Account creation timestamp',
+    last_login TIMESTAMP NULL COMMENT 'Last login timestamp',
+    
+    INDEX idx_username (username)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='Admin panel user accounts';
+
+-- ==========================================
+-- Insert Default Data
+-- ==========================================
+
+-- Insert initial daily stats for today
+INSERT IGNORE INTO daily_stats (stat_date, total_signatures, total_reports)
+VALUES (CURDATE(), 0, 0);
+
+-- Insert default admin user
+-- Default credentials: username=admin, password=admin123
+-- Password hash is MD5 of 'admin123': 0192023a7bbd73250516f069df18b500
+-- IMPORTANT: Change this password after first login!
+INSERT IGNORE INTO admin_users (username, password_hash, email)
+VALUES ('admin', '0192023a7bbd73250516f069df18b500', 'admin@example.com');
+
+-- ==========================================
+-- Useful Queries for Development/Testing
+-- ==========================================
+
+-- View all reports with counts
+-- SELECT 
+--     vr.*,
+--     (SELECT COUNT(*) FROM report_reactions WHERE report_id = vr.id AND reaction_type = 'like') as likes,
+--     (SELECT COUNT(*) FROM report_reactions WHERE report_id = vr.id AND reaction_type = 'dislike') as dislikes,
+--     (SELECT COUNT(*) FROM report_comments WHERE report_id = vr.id) as comments
+-- FROM violation_reports vr
+-- ORDER BY vr.created_at DESC;
+
+-- View statistics
+-- SELECT 
+--     (SELECT COUNT(*) FROM signatures) as total_signatures,
+--     (SELECT COUNT(*) FROM violation_reports) as total_reports,
+--     (SELECT COUNT(*) FROM violation_reports WHERE status = 'pending') as pending_reports,
+--     (SELECT COUNT(*) FROM violation_reports WHERE status = 'verified') as verified_reports,
+--     (SELECT COUNT(*) FROM report_comments) as total_comments,
+--     (SELECT COUNT(DISTINCT city) FROM signatures WHERE city != '') as cities_count;
+
+-- ==========================================
+-- Change Admin Password
+-- ==========================================
+-- To generate MD5 hash for a new password:
+-- echo -n "your_new_password" | md5sum
+-- 
+-- Then update with:
+-- UPDATE admin_users SET password_hash = 'YOUR_MD5_HASH' WHERE username = 'admin';
+-- ==========================================
